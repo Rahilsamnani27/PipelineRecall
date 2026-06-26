@@ -1,0 +1,250 @@
+[
+  {
+    "id": "INC-001",
+    "pipeline": "daily_orders_etl",
+    "timestamp": "2026-05-02T03:14:00Z",
+    "status": "failure",
+    "error": "ERROR: Column 'customer_id' not found in source table 'orders_raw'. Schema validation failed.",
+    "root_cause": "Upstream API renamed 'cust_id' to 'customer_id' without notice.",
+    "fix": "Updated column mapping in transform step to handle both old and new field names."
+  },
+  {
+    "id": "INC-002",
+    "pipeline": "user_dim_refresh",
+    "timestamp": "2026-05-03T01:02:00Z",
+    "status": "failure",
+    "error": "ERROR: Duplicate primary key detected in 'users' table. 842 rows affected.",
+    "root_cause": "Source CDC stream sent duplicate insert events after a brief network retry.",
+    "fix": "Added deduplication step using row_number() window function before merge."
+  },
+  {
+    "id": "INC-003",
+    "pipeline": "transactions_sync",
+    "timestamp": "2026-05-03T04:45:00Z",
+    "status": "failure",
+    "error": "ERROR: Upstream dependency 'staging.payments' returned 0 rows. Pipeline halted.",
+    "root_cause": "Upstream payments job failed silently due to a credential expiry.",
+    "fix": "Rotated expired service account credentials, added 0-row alert check."
+  },
+  {
+    "id": "INC-004",
+    "pipeline": "daily_orders_etl",
+    "timestamp": "2026-05-09T03:11:00Z",
+    "status": "failure",
+    "error": "ERROR: Column 'customer_id' not found in source table 'orders_raw'. Schema validation failed.",
+    "root_cause": "Same upstream API reverted the rename temporarily during a rollback.",
+    "fix": "Reapplied the dual-field mapping fix from INC-001; added schema monitoring alert."
+  },
+  {
+    "id": "INC-005",
+    "pipeline": "inventory_snapshot",
+    "timestamp": "2026-05-04T02:30:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 4m12s, processed 1.2M rows, no anomalies."
+  },
+  {
+    "id": "INC-006",
+    "pipeline": "marketing_attribution",
+    "timestamp": "2026-05-05T05:00:00Z",
+    "status": "failure",
+    "error": "ERROR: Query timeout after 1800s on table 'click_events'.",
+    "root_cause": "Missing partition pruning caused full table scan after a 3x data volume spike.",
+    "fix": "Added date partition filter and increased cluster size during peak hours."
+  },
+  {
+    "id": "INC-007",
+    "pipeline": "transactions_sync",
+    "timestamp": "2026-05-06T04:40:00Z",
+    "status": "failure",
+    "error": "ERROR: Upstream dependency 'staging.payments' returned 0 rows. Pipeline halted.",
+    "root_cause": "Service account credentials expired again after 30-day rotation policy triggered.",
+    "fix": "Migrated to long-lived credentials with automated rotation and pre-expiry alerting."
+  },
+  {
+    "id": "INC-008",
+    "pipeline": "warehouse_replenishment",
+    "timestamp": "2026-05-06T06:15:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 2m05s, processed 340K rows, no anomalies."
+  },
+  {
+    "id": "INC-009",
+    "pipeline": "user_dim_refresh",
+    "timestamp": "2026-05-07T01:05:00Z",
+    "status": "failure",
+    "error": "ERROR: Duplicate primary key detected in 'users' table. 12 rows affected.",
+    "root_cause": "Same CDC duplication pattern as INC-002, retry storm during deploy window.",
+    "fix": "Reused dedup logic from INC-002; reduced retry storm by adding backoff to CDC connector."
+  },
+  {
+    "id": "INC-010",
+    "pipeline": "shipment_tracking",
+    "timestamp": "2026-05-08T03:20:00Z",
+    "status": "failure",
+    "error": "ERROR: Null value in non-nullable column 'tracking_status'.",
+    "root_cause": "Carrier API returned an undocumented null status code for delayed packages.",
+    "fix": "Added null-coalescing default value 'UNKNOWN' and logged for manual review."
+  },
+  {
+    "id": "INC-011",
+    "pipeline": "daily_orders_etl",
+    "timestamp": "2026-05-10T03:09:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 3m40s, processed 980K rows, no anomalies."
+  },
+  {
+    "id": "INC-012",
+    "pipeline": "ad_spend_ingestion",
+    "timestamp": "2026-05-11T02:00:00Z",
+    "status": "failure",
+    "error": "ERROR: Authentication failed (401) calling Meta Ads API.",
+    "root_cause": "OAuth token expired; refresh job had not run due to a misconfigured cron schedule.",
+    "fix": "Fixed cron schedule for token refresh job and added expiry alert 24h in advance."
+  },
+  {
+    "id": "INC-013",
+    "pipeline": "transactions_sync",
+    "timestamp": "2026-05-12T04:42:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 5m02s, processed 2.1M rows, no anomalies."
+  },
+  {
+    "id": "INC-014",
+    "pipeline": "customer_support_logs",
+    "timestamp": "2026-05-13T07:10:00Z",
+    "status": "failure",
+    "error": "ERROR: Encoding error - invalid UTF-8 byte sequence in column 'message_body'.",
+    "root_cause": "A subset of support tickets contained legacy Latin-1 encoded text from an old system migration.",
+    "fix": "Added encoding detection and conversion step before loading into the warehouse."
+  },
+  {
+    "id": "INC-015",
+    "pipeline": "marketing_attribution",
+    "timestamp": "2026-05-14T05:05:00Z",
+    "status": "failure",
+    "error": "ERROR: Query timeout after 1800s on table 'click_events'.",
+    "root_cause": "Same partition pruning issue as INC-006; a new dashboard query bypassed the date filter.",
+    "fix": "Enforced partition filter at the view level so all downstream queries inherit it."
+  },
+  {
+    "id": "INC-016",
+    "pipeline": "inventory_snapshot",
+    "timestamp": "2026-05-15T02:31:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 4m20s, processed 1.3M rows, no anomalies."
+  },
+  {
+    "id": "INC-017",
+    "pipeline": "payroll_export",
+    "timestamp": "2026-05-16T06:00:00Z",
+    "status": "failure",
+    "error": "ERROR: Row count mismatch - expected 5,400 employees, got 5,398.",
+    "root_cause": "Two contractor records were filtered out by an overly strict employment-type filter.",
+    "fix": "Updated filter to include 'contractor' employment type explicitly."
+  },
+  {
+    "id": "INC-018",
+    "pipeline": "shipment_tracking",
+    "timestamp": "2026-05-17T03:25:00Z",
+    "status": "failure",
+    "error": "ERROR: Null value in non-nullable column 'tracking_status'.",
+    "root_cause": "Same carrier API null-status issue as INC-010, occurring on a different carrier.",
+    "fix": "Reused null-coalescing fix from INC-010, generalized across all carrier adapters."
+  },
+  {
+    "id": "INC-019",
+    "pipeline": "warehouse_replenishment",
+    "timestamp": "2026-05-18T06:18:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 2m11s, processed 355K rows, no anomalies."
+  },
+  {
+    "id": "INC-020",
+    "pipeline": "ad_spend_ingestion",
+    "timestamp": "2026-05-19T02:05:00Z",
+    "status": "failure",
+    "error": "ERROR: Rate limit exceeded (429) calling Google Ads API.",
+    "root_cause": "Pipeline made per-campaign API calls instead of batching, exceeding quota during a campaign launch.",
+    "fix": "Switched to batched API calls and added exponential backoff on 429 responses."
+  },
+  {
+    "id": "INC-021",
+    "pipeline": "user_dim_refresh",
+    "timestamp": "2026-05-20T01:08:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 1m50s, processed 410K rows, no anomalies."
+  },
+  {
+    "id": "INC-022",
+    "pipeline": "customer_support_logs",
+    "timestamp": "2026-05-21T07:15:00Z",
+    "status": "failure",
+    "error": "ERROR: Encoding error - invalid UTF-8 byte sequence in column 'message_body'.",
+    "root_cause": "Same legacy encoding issue as INC-014, new batch of migrated tickets.",
+    "fix": "Reused encoding conversion fix from INC-014; flagged source system for full re-migration."
+  },
+  {
+    "id": "INC-023",
+    "pipeline": "daily_orders_etl",
+    "timestamp": "2026-05-22T03:12:00Z",
+    "status": "failure",
+    "error": "ERROR: Column 'customer_id' not found in source table 'orders_raw'. Schema validation failed.",
+    "root_cause": "Third occurrence - upstream team re-deployed an old API version during a hotfix rollback.",
+    "fix": "Escalated to upstream team for permanent fix; added contract test to catch this before pipeline run."
+  },
+  {
+    "id": "INC-024",
+    "pipeline": "shipment_tracking",
+    "timestamp": "2026-05-23T03:28:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 2m45s, processed 220K rows, no anomalies."
+  },
+  {
+    "id": "INC-025",
+    "pipeline": "payroll_export",
+    "timestamp": "2026-05-24T06:02:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 1m30s, processed 5,402 rows, no anomalies."
+  },
+  {
+    "id": "INC-026",
+    "pipeline": "marketing_attribution",
+    "timestamp": "2026-05-25T05:08:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 3m15s, processed 4.8M rows, no anomalies."
+  },
+  {
+    "id": "INC-027",
+    "pipeline": "transactions_sync",
+    "timestamp": "2026-05-26T04:44:00Z",
+    "status": "failure",
+    "error": "ERROR: Upstream dependency 'staging.payments' returned 0 rows. Pipeline halted.",
+    "root_cause": "Third occurrence of the credential expiry issue, despite rotation fix from INC-007.",
+    "fix": "Discovered rotation script only updated one of two environments; fixed both, added cross-env validation."
+  },
+  {
+    "id": "INC-028",
+    "pipeline": "inventory_snapshot",
+    "timestamp": "2026-05-27T02:33:00Z",
+    "status": "failure",
+    "error": "ERROR: Duplicate primary key detected in 'inventory_items' table. 56 rows affected.",
+    "root_cause": "Same CDC retry-storm pattern as INC-002/INC-009, now affecting a different table.",
+    "fix": "Applied the generalized dedup + backoff fix across all CDC-fed tables, not just users."
+  },
+  {
+    "id": "INC-029",
+    "pipeline": "ad_spend_ingestion",
+    "timestamp": "2026-05-28T02:10:00Z",
+    "status": "success",
+    "details": "Pipeline completed in 2m02s, processed 88K rows, no anomalies."
+  },
+  {
+    "id": "INC-030",
+    "pipeline": "warehouse_replenishment",
+    "timestamp": "2026-05-29T06:20:00Z",
+    "status": "failure",
+    "error": "ERROR: Connection pool exhausted - 'too many clients already' from source database.",
+    "root_cause": "A new dashboard tool was opening persistent connections to the same database without pooling.",
+    "fix": "Enforced connection pooling limits and moved dashboard tool to a read replica."
+  }
+]
