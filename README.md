@@ -60,12 +60,15 @@ Run `python src/demo.py` to see this comparison live.
 
 The agent doesn't only rely on pre-loaded data — it learns **during the session itself**. Try this in `python src/cli.py`:
 
-1. Describe a brand-new incident → memory finds 0 matches → agent flags it as novel and escalates.
-2. Describe the same incident again, seconds later → memory now finds genuine matches, because the agent just saved its own diagnosis.
+**First pass — a brand-new incident:** memory finds 0 matches, the agent explicitly flags it as novel, and escalates to the strong model.
 
-![CLI live learning](screenshots/cli-live-learning.png)
+![CLI live learning - first pass, novel incident](screenshots/cli-live-learning.png)
 
-Note: cascadeflow's escalation decision is based on response *quality*, not just whether memory exists — so even a recalled incident can still escalate if the diagnosis needs more reasoning. This is intentional: routing reflects real confidence, not a shortcut.
+**Second pass — the same incident, described again seconds later:** memory now finds 3 genuine matches, because the agent saved its own diagnosis moments earlier.
+
+![CLI live learning - second pass, memory recalls itself](screenshots/cli-live-learning2.png)
+
+Note: cascadeflow's escalation decision is based on response *quality*, not just whether memory exists — in this run it escalated both times, since the diagnosis still needed more reasoning even with relevant memory available. This is intentional: routing reflects real confidence, not a shortcut.
 
 ## Memory in Action
 
